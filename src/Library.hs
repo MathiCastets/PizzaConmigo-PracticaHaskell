@@ -1,6 +1,5 @@
 module Library where
 import PdePreludat
-import GHC.Read (list)
 
 --1.
 --a.
@@ -77,7 +76,7 @@ type Pizzeria = Pedido -> Pedido
 pizzeriaLosHijosDePato = map $ agregarIngrediente "Palmito" 
 --b Entrega las combinaciones de una pizza con la siguiente: la 1ra con la 2da, la 2da con la tercera y asi. Queda 1 pizza menos
 
-pizzeriaElResumen pedido = zipWith
+pizzeriaElResumen pedido = zipWith mezcladita pedido (tail pedido)
 
 --c 
 
@@ -103,8 +102,24 @@ pizzeriaGourmet nivelDeExquisitez = map agrandar . filter ((>nivelDeExquisitez).
 pizzeriaLaJauja = pizzeriaGourmet 399
 
 --7
---a
-sonDignasDeCalleCorrientes pedido pizzerias = 
+--a Implementar la función sonDignasDeCalleCorrientes que, dado un pedido y una lista de pizzerías, devuelve aquellas pizzerías que mejoran la satisfacción del pedido.
+sonDignasDeCalleCorrientes :: Pedido -> [Pizzeria] -> [Pizzeria]
+sonDignasDeCalleCorrientes pedido = filter (esDignaDeCalleCorrientes pedido)
+
+esDignaDeCalleCorrientes :: Pedido -> Pizzeria -> Bool
+esDignaDeCalleCorrientes pedido pizzeria= (nivelDeSatisfaccionPedido.pizzeria) pedido > nivelDeSatisfaccionPedido pedido
+
+--b
+mejorPizzeria :: Pedido -> [Pizzeria] -> Pizzeria
+mejorPizzeria pedido = foldl1 (masSatisfactoria pedido)
+
+masSatisfactoria :: Pedido -> Pizzeria -> Pizzeria -> Pizzeria
+masSatisfactoria pedido pizzeria1 pizzeria2
+    |valorSatisfacion pizzeria1 > valorSatisfacion pizzeria2 = pizzeria1
+    |otherwise = pizzeria2
+    where valorSatisfacion pizzeria = nivelDeSatisfaccionPedido.pizzeria $ pedido
+
+--busco la pizzeria que tenga mejor nivelDeSatisfaccionPedido
 
 --8
 yoPidoCualquierPizza x y z = any (odd . x . fst) z && all (y . snd) z
@@ -113,3 +128,7 @@ por otro lado z se trata de una lista de tuplas, a la que se le aplicaran las co
 En la primer parte del && so se encuentra que el primer valor de alguna tupla de z cumple odd.x entonces devolvera true,
 mientras que la segunda parte devolvera true si el segundo valor de alguna de las tuplas cumple con la funcion y
 -}
+
+--9
+laPizzeriaPredilecta :: [Pizzeria] -> Pizzeria
+laPizzeriaPredilecta = foldl1 (.)
